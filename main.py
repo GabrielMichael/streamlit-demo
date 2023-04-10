@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import random
 
-bi_dict = {
+BI_DICT = {
     "team_member": [
         "Neele",
         "Surya",
@@ -30,27 +30,32 @@ bi_dict = {
     + ["Core/Central"] * 9,
 }
 
-bi_df = pd.DataFrame.from_dict(bi_dict)
+BI_DF = pd.DataFrame.from_dict(BI_DICT)
 
 
 def filter_df(df: pd.DataFrame, key: str) -> list:
     if key == "All":
-        return list(df["team_member"].unique())
-    else:
-        return list(df[df["team_name"] == key]["team_member"].unique())
+        return df["team_member"].unique().tolist()
+    return df[df["team_name"] == key]["team_member"].unique().tolist()
 
 
-st.title("Pick Next Moderator")
-team_selection = st.sidebar.radio(
-    "Select a team", ["All"] + list(bi_df.team_name.unique())
-)
+def main():
+    st.title("Pick Next Moderator")
+    team_selection = st.sidebar.radio(
+        "Select a team", ["All"] + BI_DF.team_name.unique().tolist()
+    )
 
-team_member_selection = st.sidebar.multiselect(
-    "Select participating team members",
-    filter_df(bi_df, team_selection),
-    default=filter_df(bi_df, team_selection),
-)
+    team_member_selection = st.sidebar.multiselect(
+        "Select participating team members",
+        filter_df(BI_DF, team_selection),
+        default=filter_df(BI_DF, team_selection),
+    )
 
-if st.button("Roll Next Moderator!"):
-    st.header(f"Next Moderator: {random.choice(team_member_selection)}")
-    st.balloons()
+    if st.button("Roll Next Moderator!"):
+        next_moderator = random.choice(team_member_selection)
+        st.header(f"Next Moderator: {next_moderator}")
+        st.balloons()
+
+
+if __name__ == "__main__":
+    main()
